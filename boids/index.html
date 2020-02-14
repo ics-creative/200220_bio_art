@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Boids</title>
+</head>
+<body>
+  <canvas id="canvas" width="1280" height="640" style="background-color: black"></canvas>
+
+  <script>
+    const canvas = document.querySelector("canvas");
+    const context = canvas.getContext("2d");
+    const Boids = [];
+
+    let radius = 10;
+
+    // 2点間の距離を測る関数です
+    function dist(x0, y0, x1, y1) {
+      return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+    }
+
+    class Bird {
+      constructor(x, y, vx, vy, id) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.id = id;
+
+        this.v1 = { x: 0, y: 0 };
+        this.v2 = { x: 0, y: 0 };
+        this.v3 = { x: 0, y: 0 };
+      }
+      update() {
+        const MAX_SPEED = 4;
+        this.vx += this.v1.x + 0.8 * this.v2.x + 0.1 * this.v3.x;
+        this.vy += this.v1.y + 0.8 * this.v2.y + 0.1 * this.v3.y;
+
+        const movement = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (movement > MAX_SPEED) {
+          this.vx = (this.vx / movement) * MAX_SPEED;
+          this.vy = (this.vy / movement) * MAX_SPEED;
+        }
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+      draw() {
+        this.v1 = { x: 0, y: 0 };
+        this.v2 = { x: 0, y: 0 };
+        this.v3 = { x: 0, y: 0 };
+
+        this.center();
+        this.avoid();
+        this.average();
+        this.update();
+        context.beginPath();
+        context.strokeStyle = "#ffffff";
+        context.arc(this.x, this.y, radius/2, 0, 2 * Math.PI);
+        context.moveTo(this.x, this.y);
+        context.lineTo(this.x + this.vx * 3, this.y + this.vy * 3);
+        context.stroke();
+      }
+      // 集団の中心に向かって移動します
+      center() {
+        Boids.forEach(bird => {
+          if (this.id !== bird.id) {
+            this.v1.x += bird.x;
+            this.v1.y += bird.y;
+          }
+        });
+        this.v1.x /= Boids.length - 1;
+        this.v1.y /= Boids.length - 1;
+
+        this.v1.x = (this.v1.x - this.x) / 400;
+        this.v1.y = (this.v1.y - this.y) / 400;
+      }
+      // DIST_THRESHOLD内に仲間がいると避けます
+      avoid() {
+        const DIST_THRESHOLD = radius;
+        Boids.forEach(bird => {
+          if (dist(this.x, this.y, bird.x, bird.y) < DIST_THRESHOLD) {
+            this.v2.x -= bird.x - this.x;
+            this.v2.y -= bird.y - this.y;
+          }
+        });
+      }
+      // 集団と同じ速度で動こうとします
+      average() {
+        Boids.forEach(bird => {
+          if (this.id !== bird.id) {
+            this.v3.x += bird.vx;
+            this.v3.y += bird.vy;
+          }
+        });
+        this.v3.x /= Boids.length - 1;
+        this.v3.y /= Boids.length - 1;
+        this.v3.x = (this.v3.x - this.vx) / 2;
+        this.v3.y = (this.v3.y - this.vy) / 2;
+      }
+    }
+
+    for (let i = 0; i < 30; i++) {
+      Boids.push(
+        new Bird(200 + Math.random() * 200, 200 + Math.random() * 100, 2, 2, i)
+      );
+    }
+
+    function loop(timestamp) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      Boids.forEach(bird => {
+        bird.draw();
+      });
+      window.requestAnimationFrame(ts => loop(ts));
+    }
+    window.requestAnimationFrame(ts => loop(ts));
+
+  </script>
+</body>
+</html>

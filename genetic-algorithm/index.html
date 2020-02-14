@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>genetic-algorithm</title>
+</head>
+<body>
+  <canvas id="canvas" width="960" height="540" style="background: black"></canvas>
+
+  <script>
+    const canvas = document.querySelector("canvas");
+    const context = canvas.getContext("2d");
+
+    let size = 80;
+    let geneLength = 360;
+
+    let generation = 0;
+    let currentAge = [];
+    let newAge = [];
+
+    let INDIVISUAL_MUTATION = 0.05;
+    let GENOME_MUTATION = 0.05;
+
+    let goal = [];
+
+    // 生物個体を表すクラスです
+    class Biont {
+      constructor(genome_list) {
+        this.genome_list = genome_list;
+      }
+      // 適応度を取得します
+      getEvaluation(goal) {
+        let score = 0;
+        for (let i = 0; i < this.genome_list.length; i++) {
+          if (goal[i] === this.genome_list[i]) {
+            score++;
+          }
+        }
+        return score / geneLength;
+      }
+
+      // genome_listの配列から0~360の色を作成します
+      getColor() {
+        let c = 0
+        for (let i = 0; i < this.genome_list.length; i++) {
+          c += this.genome_list[i]
+        }
+        return c
+      }
+      setGenome(genome) {
+        this.genome_list = genome;
+      }
+    }
+
+    // 適応度の高い遺伝子を持つ個体をvalue体だけ選別します
+    function selection(age, value) {
+      const elite = age.sort((a, b) => {
+        return b.getEvaluation(goal) - a.getEvaluation(goal);
+      });
+      return elite.slice(0, value);
+    }
+
+    // 交配させる関数です。ランダムな箇所が交叉します
+    function cross(bios1, bios2) {
+      // bios1とbios2の遺伝子配列のcross_one番目からcross_two番目を交換します
+      const cross_one = Math.round(Math.random() * geneLength);
+      const cross_two = cross_one + Math.round(Math.random() * (geneLength - cross_one));
+      const one = bios1.genome_list;
+      const two = bios2.genome_list;
+      const progeny_one = [
+        ...one.slice(0, cross_one),
+        ...two.slice(cross_one, cross_two),
+        ...one.slice(cross_two, geneLength)
+      ];
+      const progeny_two = [
+        ...two.slice(0, cross_one),
+        ...one.slice(cross_one, cross_two),
+        ...two.slice(cross_two, geneLength)
+      ];
+      return [new Biont(progeny_one), new Biont(progeny_two)];
+    }
+
+    // 遺伝子に変異を加えます
+    function mutation(age, individual_mutation, genome_mutation) {
+      let ga_list = [];
+      age.forEach(i => {
+        if (individual_mutation > Math.random()) {
+          let mutated_genome_list = [];
+          i.genome_list.forEach(genome => {
+            if (genome_mutation > Math.random()) {
+              mutated_genome_list.push(Math.round(Math.random()));
+            } else {
+              mutated_genome_list.push(genome);
+            }
+          });
+          i.setGenome(mutated_genome_list);
+          ga_list.push(i);
+        } else {
+          ga_list.push(i);
+        }
+      });
+      return ga_list;
+    }
+
+    // 次世代を作ります
+    function nextGeneration(age, elite, progeny) {
+      const sorted_age = age.sort((a, b) => {
+        return a.getEvaluation(goal) - b.getEvaluation(goal);
+      });
+      sorted_age.splice(0, elite.length + progeny.length);
+      sorted_age.push(...elite, ...progeny);
+      return sorted_age;
+    }
+
+    // 適応度の基準の配列を作ります
+    function createGoal() {
+      goal = [];
+      for(let i=0; i <geneLength; i++){
+        goal.push(1)
+      }
+      // goalは[1, 1, 1, ...... , 1]となります
+      context.beginPath();
+      context.fillStyle = `hsl(${geneLength},50%,50%)`;
+      context.rect(canvas.width - 10, 0, canvas.width, canvas.height);
+      context.fill();
+    }
+
+    // 個体の遺伝子配列をランダムに作成します
+    function createGenome() {
+      const genome_list = [];
+      let c = Math.floor(Math.random() * geneLength);
+      for (let i = 0; i < c; i++) {
+        genome_list.push(1);
+      }
+      for (let j = 0; j < geneLength - c; j++) {
+        genome_list.push(0);
+      }
+      return new Biont(genome_list);
+    }
+
+    function setup() {
+      for (let i = 0; i < size; i++) {
+        currentAge[i] = createGenome(geneLength);
+      }
+      generation = 0;
+      createGoal();
+    }
+
+
+    setup()
+    function loop(timestamp) {
+      if (generation < 120) {
+        // selection
+        const elite = selection(currentAge, 2);
+        // eliteの子供を作成
+        const progeny = [];
+        for (let i = 0; i < elite.length - 1; i++) {
+          progeny.push(...cross(elite[i], elite[i + 1]));
+        }
+        // elite, progeny, 現在の世代から適応度の高い順に選別
+        newAge = nextGeneration(currentAge, elite, progeny);
+        // 適度に変異を入れる
+        newAge = mutation(newAge, INDIVISUAL_MUTATION, GENOME_MUTATION);
+        // 描画
+        newAge.forEach((age, index) => {
+          context.beginPath();
+          context.fillStyle = `hsl(${age.getColor()},50%,50%)`;
+          context.arc(4 + 8 * generation, 2 + index * 8, 4, 0, 2 * Math.PI);
+          context.fill();
+        });
+        generation ++;
+        // 次世代を現世代に
+        currentAge = newAge;
+        newAge = [];
+      }
+      window.requestAnimationFrame(ts => loop(ts));
+    }
+    window.requestAnimationFrame(ts => loop(ts));
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>genetic-algorithm</title>
+</head>
+<body>
+  <canvas id="canvas" width="1280" height="640"></canvas>
+
+  <script>
+    const canvas = document.querySelector("canvas")
+    const context = canvas.getContext("2d")
+
+    let group = []
+
+    let B = 0.0015
+    let k = 12
+    let D = 1
+    let S = 99, I = 1, R = 0
+    let Si = S, Ii=I, Ri=R
+
+    class Person {
+      constructor(x, y, r, status) {
+        this.x = x
+        this.y = y
+        this.r = r
+        this.status = status
+      }
+      draw() {
+        let c
+        if (this.status === "S") {
+          c = 0
+          context.fillStyle = "#000000"
+        } else if (this.status === "I") {
+          c = 100
+          context.fillStyle = "#ff0000"
+        } else if (this.status === "R") {
+          c = 200
+          context.fillStyle = "#c8c8c8"
+        }
+        // context.fillStyle = `rgb(${c}, ${c}, ${c})`
+        context.beginPath()
+        context.arc(this.x + 20, this.y + 20, this.r,0, 2 * Math.PI)
+        context.fill()
+        context.closePath()
+      }
+      update(newStatus){
+        this.status = newStatus
+      }
+    }
+
+    function setup(){
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          if (i * j < 100) {
+            group.push(new Person(i * 20, j * 20, 10, "S"))
+          } else {
+            group.push(new Person(i * 20, j * 20, 10, "I"))
+          }
+        }
+      }
+      group.forEach(person => person.draw())
+    }
+
+    function changeStatus(group, statusArr) {
+      group.forEach((person, index) => {
+        person.update(statusArr[index])
+        person.draw()
+      })
+    }
+
+    setup()
+    let timer1 = setInterval("loop()", 1000)
+    function loop(){
+        context.clearRect(0,0,canvas.width, canvas.height)
+      S = Si -(B * k * Si * Ii)
+      I = Ii + (B * k * Si * Ii - Ii / D)
+      R = Ri + (Ii / D)
+      S = Math.round(S)
+      I = Math.round(I)
+      R = Math.round(R)
+      statusArr = []
+      for (let i = 0; i < S; i++) {
+        statusArr.push("S")
+      }
+      for (let j = 0; j < I; j++) {
+        statusArr.push("I")
+      }
+      for (let k = 0; k < R; k++) {
+        statusArr.push("R")
+      }
+      // text("S:" + (S), 250, 50)
+      // text("I:" + (I), 250, 80)
+      // text("R:" + (R), 250, 110)
+      changeStatus(group, statusArr)
+
+      Si = S
+      Ii = I
+      Ri = R
+
+      // setTimeout(() => {
+      //   window.requestAnimationFrame(ts => loop(ts))
+      // }, 1000)
+    }
+    // window.requestAnimationFrame(ts => loop(ts))
+  </script>
+</body>
+</html>
