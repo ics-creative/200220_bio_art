@@ -2,80 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>genetic-algorithm</title>
+  <title>game of life</title>
 </head>
 <body>
   <canvas id="canvas" width="720" height="400"></canvas>
 
   <script>
-    const canvas = document.querySelector("canvas")
-    const context = canvas.getContext("2d")
+    const canvas = document.querySelector("canvas");
+    const context = canvas.getContext("2d");
 
-    let cell = []
-    const cellSize = 8
+    let cell = [];
+    // セルの大きさ
+    const cellSize = 8;
 
-    const cols = Math.floor(canvas.width / cellSize)
-    const rows = Math.floor(canvas.height / cellSize)
+    // 1列のセルの個数
+    const cols = Math.floor(canvas.width / cellSize);
+    // 1行のセルの個数
+    const rows = Math.floor(canvas.height / cellSize);
 
-    function initCells(){
-      context.fillStyle = "rgb(60, 60, 60)"
-      context.fillRect(0,0,canvas.width, canvas.height)
-      for (let col = 0; col < cols;col++){
-        cell[col] = []
-        for (let row = 0; row < rows; row++){
-          cell[col][row] = Math.round(Math.random())
+    function initCells() {
+      context.fillStyle = "rgb(60, 60, 60)";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      for (let col = 0; col < cols; col++) {
+        cell[col] = [];
+        for (let row = 0; row < rows; row++) {
+          cell[col][row] = Math.round(Math.random());
         }
       }
-      draw()
+      draw();
     }
-    
+    // セルの描画を実行
     function draw() {
-      for (let col = 0; col < cols; col++){
-        for(let row = 0; row < rows; row++){
-          drawCell(col, row)
+      for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows; row++) {
+          drawCell(col, row);
         }
       }
     }
-
-    function drawCell(x,y) {
-      const state = cell[x][y]
-      context.fillStyle = state ? "rgb(0,0,100)" : "rgb(255,255,255)"
-      context.fillRect(x*cellSize, y*cellSize, cellSize-1, cellSize-1)
+    // セルの描画を指定
+    function drawCell(x, y) {
+      const state = cell[x][y];
+      context.fillStyle = state ? "rgb(0,0,100)" : "rgb(255,255,255)";
+      context.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
     }
 
+    // 周囲9マスのセルのうち、生存しているセルの数を返す関数
     function checkAround(x, y) {
-      let count = 0
-      for(let i = -1; i <=1; i++){
-        for(let j = -1; j <= 1; j++){
-          if((i !==0 || j !== 0) && x+i>0 && x+i<cols && y+j>0&&y+j<rows ){
-            count += cell[x+i][y+j]
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (
+            (i !== 0 || j !== 0) &&
+            x + i > 0 &&
+            x + i < cols &&
+            y + j > 0 &&
+            y + j < rows
+          ) {
+            count += cell[x + i][y + j];
           }
         }
       }
-      return count
-    }
-    
-    function proceed() {
-      for(let col = 0; col < cols; col++){
-        for(let row = 0; row < rows; row++){
-          let count = checkAround(col, row)
-          let currentState = cell[col][row]
-          let nextState = 0
-          if(count === 2) {
-            nextState = currentState ? 1 : 0
-          }
-          if(count === 3) nextState = 1
-          cell[col][row] = nextState
-        }
-      }
-      draw()
+      return count;
     }
 
-    initCells()
-    let timer1 = setInterval("loop()", 100)
-    function loop(){
-        proceed()
+    // ループごとにセルの状態を変える関数
+    function proceed() {
+      for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows; row++) {
+          let count = checkAround(col, row);
+          let currentState = cell[col][row];
+          let nextState = 0;
+          if (count === 2) {
+            nextState = currentState ? 1 : 0;
+          }
+          if (count === 3) nextState = 1;
+          cell[col][row] = nextState;
+        }
+      }
+      draw();
     }
+
+    initCells();
+    // 100ミリ秒ごとにproceed関数を実行
+    let timer1 = setInterval("proceed()", 100);
 
   </script>
 </body>
