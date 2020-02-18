@@ -69,12 +69,15 @@
     function proceed() {
       for (let col = 0; col < cols; col++) {
         for (let row = 0; row < rows; row++) {
+          // 周りの生存セルの数を取得
           let count = checkAround(col, row);
           let currentState = cell[col][row];
           let nextState = 0;
+          // 生存時に周りに2体いるときは維持
           if (count === 2) {
             nextState = currentState ? 1 : 0;
           }
+          // 周りに3体いるときは誕生または維持
           if (count === 3) nextState = 1;
           cell[col][row] = nextState;
         }

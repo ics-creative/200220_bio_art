@@ -11,10 +11,10 @@
     const canvas = document.querySelector("canvas");
     const context = canvas.getContext("2d");
 
-    let size = 320;
+    let size = 180;
     let geneLength = 360;
 
-    let radius = canvas.width/(size*2)
+    let radius = canvas.width / (size * 2);
 
     let generation = 0;
     let currentAge = [];
@@ -43,11 +43,11 @@
 
       // genome_listの配列から0~360の色を作成します
       getColor() {
-        let c = 0
+        let c = 0;
         for (let i = 0; i < this.genome_list.length; i++) {
-          c += this.genome_list[i]
+          c += this.genome_list[i];
         }
-        return c
+        return c;
       }
       setGenome(genome) {
         this.genome_list = genome;
@@ -66,7 +66,8 @@
     function cross(bios1, bios2) {
       // bios1とbios2の遺伝子配列のcross_one番目からcross_two番目を交換します
       const cross_one = Math.round(Math.random() * geneLength);
-      const cross_two = cross_one + Math.round(Math.random() * (geneLength - cross_one));
+      const cross_two =
+        cross_one + Math.round(Math.random() * (geneLength - cross_one));
       const one = bios1.genome_list;
       const two = bios2.genome_list;
       const progeny_one = [
@@ -117,8 +118,8 @@
     // 適応度の基準の配列を作ります
     function createGoal() {
       goal = [];
-      for(let i=0; i <geneLength; i++){
-        goal.push(1)
+      for (let i = 0; i < geneLength; i++) {
+        goal.push(1);
       }
       // goalは[1, 1, 1, ...... , 1]となります
       context.beginPath();
@@ -148,10 +149,9 @@
       createGoal();
     }
 
-
-    setup()
+    setup();
     function loop(timestamp) {
-      if (generation < 115) {
+      if (generation < 66) {
         // selection
         const elite = selection(currentAge, 2);
         // eliteの子供を作成
@@ -167,10 +167,16 @@
         newAge.forEach((age, index) => {
           context.beginPath();
           context.fillStyle = `hsl(${age.getColor()},50%,50%)`;
-          context.arc( radius/2 + index * 2 * radius,canvas.height - (radius + radius*3*generation), radius, 0, 2 * Math.PI);
+          context.arc(
+            radius / 2 + index * 2 * radius,
+            canvas.height - (radius + radius * 3 * generation),
+            radius,
+            0,
+            2 * Math.PI
+          );
           context.fill();
         });
-        generation ++;
+        generation++;
         // 次世代を現世代に
         currentAge = newAge;
         newAge = [];
@@ -178,6 +184,7 @@
       window.requestAnimationFrame(ts => loop(ts));
     }
     window.requestAnimationFrame(ts => loop(ts));
+
 
   </script>
 </body>
