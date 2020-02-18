@@ -11,8 +11,10 @@
     const canvas = document.querySelector("canvas");
     const context = canvas.getContext("2d");
 
-    let size = 80;
+    let size = 320;
     let geneLength = 360;
+
+    let radius = canvas.width/(size*2)
 
     let generation = 0;
     let currentAge = [];
@@ -121,7 +123,7 @@
       // goalは[1, 1, 1, ...... , 1]となります
       context.beginPath();
       context.fillStyle = `hsl(${geneLength},50%,50%)`;
-      context.rect(canvas.width - 10, 0, canvas.width, canvas.height);
+      context.rect(0, 0, canvas.width, 10);
       context.fill();
     }
 
@@ -149,7 +151,7 @@
 
     setup()
     function loop(timestamp) {
-      if (generation < 120) {
+      if (generation < 115) {
         // selection
         const elite = selection(currentAge, 2);
         // eliteの子供を作成
@@ -165,7 +167,7 @@
         newAge.forEach((age, index) => {
           context.beginPath();
           context.fillStyle = `hsl(${age.getColor()},50%,50%)`;
-          context.arc(4 + 8 * generation, 2 + index * 8, 4, 0, 2 * Math.PI);
+          context.arc( radius/2 + index * 2 * radius,canvas.height - (radius + radius*3*generation), radius, 0, 2 * Math.PI);
           context.fill();
         });
         generation ++;
