@@ -12,9 +12,16 @@
     const context = canvas.getContext("2d");
     const Boids = [];
 
-    let radius = 10;
+    const radius = 10;
 
-    // 2点間の距離を測る関数です
+    /**
+     * (x0, y0)と(x1, y1)の距離を返す関数です
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @returns {number}
+     */
     function dist(x0, y0, x1, y1) {
       return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
     }
@@ -49,25 +56,24 @@
         this.v2 = { x: 0, y: 0 };
         this.v3 = { x: 0, y: 0 };
 
-        this.center();
-        this.avoid();
-        this.average();
+        this.getToCenterVector();
+        this.getAvoidanceVector();
+        this.getAverageVelocityVector();
         this.update();
         context.beginPath();
         context.strokeStyle = "#ffffff";
-        context.arc(this.x, this.y, radius/2, 0, 2 * Math.PI);
+        context.arc(this.x, this.y, radius / 2, 0, 2 * Math.PI);
         context.moveTo(this.x, this.y);
         context.lineTo(this.x + this.vx * 3, this.y + this.vy * 3);
         context.stroke();
       }
       // 集団の中心に向かって移動します
-      center() {
+      getToCenterVector() {
+        // 他の個体の座標の平均をgetToCenterVectorに代入します
         const center = { x: 0, y: 0 };
-        Boids.forEach(biont => {
-          if (this.id !== biont.id) {
-            center.x += biont.x;
-            center.y += biont.y;
-          }
+        Boids.filter(biont => this.id !== biont.id).forEach(biont => {
+          center.x += biont.x;
+          center.y += biont.y;
         });
         center.x /= Boids.length - 1;
         center.y /= Boids.length - 1;
@@ -76,27 +82,27 @@
         this.v1.y = (center.y - this.y) / 400;
       }
       // DIST_THRESHOLD内に仲間がいると避けます
-      avoid() {
+      getAvoidanceVector() {
         const DIST_THRESHOLD = radius;
-        Boids.forEach(biont => {
-          if (dist(this.x, this.y, biont.x, biont.y) < DIST_THRESHOLD) {
-            this.v2.x -= biont.x - this.x;
-            this.v2.y -= biont.y - this.y;
-          }
+        Boids.filter(
+          biont => dist(this.x, this.y, biont.x, biont.y) < DIST_THRESHOLD
+        ).forEach(biont => {
+          this.v2.x -= biont.x - this.x;
+          this.v2.y -= biont.y - this.y;
         });
       }
       // 集団と同じ速度で動こうとします
-      average() {
-        Boids.forEach(biont => {
-          if (this.id !== biont.id) {
-            this.v3.x += biont.vx;
-            this.v3.y += biont.vy;
-          }
+      getAverageVelocityVector() {
+        // avgVに各個体の速度の平均を代入します
+        const avgV = { x: 0, y: 0 };
+        Boids.filter(biont => this.id !== biont.id).forEach(biont => {
+          avgV.x += biont.vx;
+          avgV.y += biont.vy;
         });
-        this.v3.x /= Boids.length - 1;
-        this.v3.y /= Boids.length - 1;
-        this.v3.x = (this.v3.x - this.vx) / 2;
-        this.v3.y = (this.v3.y - this.vy) / 2;
+        avgV.x /= Boids.length - 1;
+        avgV.y /= Boids.length - 1;
+        this.v3.x = (avgV.x - this.vx) / 2;
+        this.v3.y = (avgV.y - this.vy) / 2;
       }
     }
 
@@ -114,6 +120,7 @@
       window.requestAnimationFrame(ts => loop(ts));
     }
     window.requestAnimationFrame(ts => loop(ts));
+
 
   </script>
 </body>

@@ -11,17 +11,17 @@
     const canvas = document.querySelector("canvas");
     const context = canvas.getContext("2d");
 
-    let generationSize = 180;
-    let genomeSize = 360;
+    const generationSize = 180;
+    const genomeSize = 360;
 
-    let radius = canvas.width / (generationSize * 2);
+    const radius = canvas.width / (generationSize * 2);
 
     let generation = 0;
     let currentAge = [];
     let newAge = [];
 
-    let INDIVISUAL_MUTATION = 0.05;
-    let GENOME_MUTATION = 0.05;
+    const INDIVISUAL_MUTATION = 0.05;
+    const GENOME_MUTATION = 0.05;
 
     let goal = [];
 
@@ -30,6 +30,7 @@
       constructor(genome) {
         this.genome = genome;
       }
+
       // 適応度を取得します
       getEvaluation(goal) {
         let score = 0;
@@ -44,24 +45,35 @@
       // genomeの要素を足し合わせ、合計の数値を返します
       getColor() {
         return this.genome.reduce((total, current) => {
-          return total + current
+          return total + current;
         }, 0);
       }
+
       setGenome(genome) {
         this.genome = genome;
       }
     }
 
-    // 適応度の高い遺伝子を持つ個体をvalue体だけ選別します
-    function selection(age, value) {
+    /**
+     * 適応度の高い遺伝子を持つ個体をvalue体だけ選別します
+     * @param age
+     * @param value
+     * @returns {Int16Array}
+     */
+    function getElite(age, value) {
       const elite = age.sort((a, b) => {
         return b.getEvaluation(goal) - a.getEvaluation(goal);
       });
       return elite.slice(0, value);
     }
 
-    // 引数bios1, bios2の遺伝子配列を交叉させた子を返します
-    function cross(bios1, bios2) {
+    /**
+     * 引数bios1, bios2の遺伝子配列を交叉させた子を返します
+     * @param bios1
+     * @param bios2
+     * @returns {Biont[]}
+     */
+    function getCrossedProgeny(bios1, bios2) {
       // bios1とbios2の遺伝子配列のcrossOne番目からcrossTwo番目を交換します
       const crossOne = Math.round(Math.random() * genomeSize);
       const crossTwo =
@@ -81,8 +93,14 @@
       return [new Biont(progenyOne), new Biont(progenyTwo)];
     }
 
-    // 次世代を作ります
-    function nextGeneration(age, elite, progeny) {
+    /**
+     * 次世代を作ります
+     * @param age
+     * @param elite
+     * @param progeny
+     * @returns {this | this | this | this | this | this | this | this | this | this | this | this | void}
+     */
+    function getNextGeneration(age, elite, progeny) {
       const sortedAge = age.sort((a, b) => {
         return a.getEvaluation(goal) - b.getEvaluation(goal);
       });
@@ -91,8 +109,14 @@
       return sortedAge;
     }
 
-    // 遺伝子に変異を加えます。individualMutationRateは個体が変異する確率、genomeMutationRateは遺伝子の変異確率です
-    function mutation(age, individualMutationRate, genomeMutationRate) {
+    /**
+     * 遺伝子に変異を加えます。
+     * @param age
+     * @param individualMutationRate：個体が変異する確率です
+     * @param genomeMutationRateRate：個々の遺伝子の変異確率です
+     * @returns {[]}
+     */
+    function mutation(age, individualMutationRate, genomeMutationRateRate) {
       let Boids = [];
       age.forEach(biont => {
         // 確率的に変異させる個体を選別します
@@ -100,7 +124,7 @@
           let mutatedGenome = [];
           biont.genome.forEach(genome => {
             // 確率的に変異させる遺伝子を選別します
-            if (genomeMutationRate > Math.random()) {
+            if (genomeMutationRateRate > Math.random()) {
               mutatedGenome.push(Math.round(Math.random()));
             } else {
               mutatedGenome.push(genome);
@@ -115,10 +139,12 @@
       return Boids;
     }
 
-    // 適応度の基準の配列を作ります
+    /**
+     * 適応度の基準の配列を作ります
+     */
     function createGoal() {
       // goalは[1, 1, 1, ...... , 1]となります
-      goal = Array(360).fill(1)
+      goal = Array(360).fill(1);
 
       context.beginPath();
       context.fillStyle = `hsl(${genomeSize},50%,50%)`;
@@ -126,10 +152,13 @@
       context.fill();
     }
 
-    // 個体の遺伝子配列をランダムに作成します
+    /**
+     * 個体の遺伝子配列をランダムに作成します
+     * @returns {Biont}
+     */
     function createGenome() {
       const initialGenome = [];
-      let c = Math.floor(Math.random() * genomeSize);
+      const c = Math.floor(Math.random() * genomeSize);
       for (let i = 0; i < c; i++) {
         initialGenome.push(1);
       }
@@ -139,26 +168,34 @@
       return new Biont(initialGenome);
     }
 
+    /**
+     * 初期設定を行う関数です
+     */
     function setup() {
       for (let i = 0; i < generationSize; i++) {
-        currentAge[i] = createGenome(genomeSize);
+        currentAge[i] = createGenome();
       }
       generation = 0;
       createGoal();
     }
 
     setup();
+
+    /**
+     * timestampミリ秒ごとに処理を実行します
+     * @param timestamp
+     */
     function loop(timestamp) {
       if (generation < 66) {
         // selection
-        const elite = selection(currentAge, 2);
+        const elite = getElite(currentAge, 2);
         // eliteの子供を作成
         const progeny = [];
         for (let i = 0; i < elite.length - 1; i++) {
-          progeny.push(...cross(elite[i], elite[i + 1]));
+          progeny.push(...getCrossedProgeny(elite[i], elite[i + 1]));
         }
         // elite, progeny, 現在の世代から適応度の高い順に選別
-        newAge = nextGeneration(currentAge, elite, progeny);
+        newAge = getNextGeneration(currentAge, elite, progeny);
         // 適度に変異を入れる
         newAge = mutation(newAge, INDIVISUAL_MUTATION, GENOME_MUTATION);
         // 描画
@@ -181,7 +218,9 @@
       }
       window.requestAnimationFrame(ts => loop(ts));
     }
+
     window.requestAnimationFrame(ts => loop(ts));
+
 
 
   </script>
