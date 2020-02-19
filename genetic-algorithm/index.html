@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>genetic-algorithm</title>
@@ -83,23 +83,25 @@
       return [new Biont(progeny_one), new Biont(progeny_two)];
     }
 
-    // 遺伝子に変異を加えます
+    // 遺伝子に変異を加えます。individual_mutationは個体が変異する確率、genome_mutationは遺伝子の変異確率です
     function mutation(age, individual_mutation, genome_mutation) {
       let ga_list = [];
-      age.forEach(i => {
+      age.forEach(biont => {
+        // 確率的に変異させる個体を選別します
         if (individual_mutation > Math.random()) {
           let mutated_genome_list = [];
-          i.genome_list.forEach(genome => {
+          biont.genome_list.forEach(genome => {
+            // 確率的に変異させる遺伝子を選別します
             if (genome_mutation > Math.random()) {
               mutated_genome_list.push(Math.round(Math.random()));
             } else {
               mutated_genome_list.push(genome);
             }
           });
-          i.setGenome(mutated_genome_list);
-          ga_list.push(i);
+          biont.setGenome(mutated_genome_list);
+          ga_list.push(biont);
         } else {
-          ga_list.push(i);
+          ga_list.push(biont);
         }
       });
       return ga_list;
