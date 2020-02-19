@@ -62,17 +62,18 @@
       }
       // 集団の中心に向かって移動します
       center() {
+        const center = { x: 0, y: 0 };
         Boids.forEach(biont => {
           if (this.id !== biont.id) {
-            this.v1.x += biont.x;
-            this.v1.y += biont.y;
+            center.x += biont.x;
+            center.y += biont.y;
           }
         });
-        this.v1.x /= Boids.length - 1;
-        this.v1.y /= Boids.length - 1;
+        center.x /= Boids.length - 1;
+        center.y /= Boids.length - 1;
 
-        this.v1.x = (this.v1.x - this.x) / 400;
-        this.v1.y = (this.v1.y - this.y) / 400;
+        this.v1.x = (center.x - this.x) / 400;
+        this.v1.y = (center.y - this.y) / 400;
       }
       // DIST_THRESHOLD内に仲間がいると避けます
       avoid() {
