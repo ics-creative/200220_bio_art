@@ -11,10 +11,10 @@
     const canvas = document.querySelector("canvas");
     const context = canvas.getContext("2d");
 
-    let size = 180;
-    let geneLength = 360;
+    let generationSize = 180;
+    let genomeSize = 360;
 
-    let radius = canvas.width / (size * 2);
+    let radius = canvas.width / (generationSize * 2);
 
     let generation = 0;
     let currentAge = [];
@@ -27,30 +27,28 @@
 
     // 生物個体を表すクラスです
     class Biont {
-      constructor(genome_list) {
-        this.genome_list = genome_list;
+      constructor(genome) {
+        this.genome = genome;
       }
       // 適応度を取得します
       getEvaluation(goal) {
         let score = 0;
-        for (let i = 0; i < this.genome_list.length; i++) {
-          if (goal[i] === this.genome_list[i]) {
+        for (let i = 0; i < this.genome.length; i++) {
+          if (goal[i] === this.genome[i]) {
             score++;
           }
         }
-        return score / geneLength;
+        return score / genomeSize;
       }
 
-      // genome_listの配列から0~360の色を作成します
+      // genomeの要素を足し合わせ、合計の数値を返します
       getColor() {
-        let c = 0;
-        for (let i = 0; i < this.genome_list.length; i++) {
-          c += this.genome_list[i];
-        }
-        return c;
+        return this.genome.reduce((total, current) => {
+          return total + current
+        }, 0);
       }
       setGenome(genome) {
-        this.genome_list = genome;
+        this.genome = genome;
       }
     }
 
@@ -62,90 +60,88 @@
       return elite.slice(0, value);
     }
 
-    // 交配させる関数です。ランダムな箇所が交叉します
+    // 引数bios1, bios2の遺伝子配列を交叉させた子を返します
     function cross(bios1, bios2) {
-      // bios1とbios2の遺伝子配列のcross_one番目からcross_two番目を交換します
-      const cross_one = Math.round(Math.random() * geneLength);
-      const cross_two =
-        cross_one + Math.round(Math.random() * (geneLength - cross_one));
-      const one = bios1.genome_list;
-      const two = bios2.genome_list;
-      const progeny_one = [
-        ...one.slice(0, cross_one),
-        ...two.slice(cross_one, cross_two),
-        ...one.slice(cross_two, geneLength)
+      // bios1とbios2の遺伝子配列のcrossOne番目からcrossTwo番目を交換します
+      const crossOne = Math.round(Math.random() * genomeSize);
+      const crossTwo =
+        crossOne + Math.round(Math.random() * (genomeSize - crossOne));
+      const one = bios1.genome;
+      const two = bios2.genome;
+      const progenyOne = [
+        ...one.slice(0, crossOne),
+        ...two.slice(crossOne, crossTwo),
+        ...one.slice(crossTwo, genomeSize)
       ];
-      const progeny_two = [
-        ...two.slice(0, cross_one),
-        ...one.slice(cross_one, cross_two),
-        ...two.slice(cross_two, geneLength)
+      const progenyTwo = [
+        ...two.slice(0, crossOne),
+        ...one.slice(crossOne, crossTwo),
+        ...two.slice(crossTwo, genomeSize)
       ];
-      return [new Biont(progeny_one), new Biont(progeny_two)];
-    }
-
-    // 遺伝子に変異を加えます。individual_mutationは個体が変異する確率、genome_mutationは遺伝子の変異確率です
-    function mutation(age, individual_mutation, genome_mutation) {
-      let ga_list = [];
-      age.forEach(biont => {
-        // 確率的に変異させる個体を選別します
-        if (individual_mutation > Math.random()) {
-          let mutated_genome_list = [];
-          biont.genome_list.forEach(genome => {
-            // 確率的に変異させる遺伝子を選別します
-            if (genome_mutation > Math.random()) {
-              mutated_genome_list.push(Math.round(Math.random()));
-            } else {
-              mutated_genome_list.push(genome);
-            }
-          });
-          biont.setGenome(mutated_genome_list);
-          ga_list.push(biont);
-        } else {
-          ga_list.push(biont);
-        }
-      });
-      return ga_list;
+      return [new Biont(progenyOne), new Biont(progenyTwo)];
     }
 
     // 次世代を作ります
     function nextGeneration(age, elite, progeny) {
-      const sorted_age = age.sort((a, b) => {
+      const sortedAge = age.sort((a, b) => {
         return a.getEvaluation(goal) - b.getEvaluation(goal);
       });
-      sorted_age.splice(0, elite.length + progeny.length);
-      sorted_age.push(...elite, ...progeny);
-      return sorted_age;
+      sortedAge.splice(0, elite.length + progeny.length);
+      sortedAge.push(...elite, ...progeny);
+      return sortedAge;
+    }
+
+    // 遺伝子に変異を加えます。individualMutationRateは個体が変異する確率、genomeMutationRateは遺伝子の変異確率です
+    function mutation(age, individualMutationRate, genomeMutationRate) {
+      let Boids = [];
+      age.forEach(biont => {
+        // 確率的に変異させる個体を選別します
+        if (individualMutationRate > Math.random()) {
+          let mutatedGenome = [];
+          biont.genome.forEach(genome => {
+            // 確率的に変異させる遺伝子を選別します
+            if (genomeMutationRate > Math.random()) {
+              mutatedGenome.push(Math.round(Math.random()));
+            } else {
+              mutatedGenome.push(genome);
+            }
+          });
+          biont.setGenome(mutatedGenome);
+          Boids.push(biont);
+        } else {
+          Boids.push(biont);
+        }
+      });
+      return Boids;
     }
 
     // 適応度の基準の配列を作ります
     function createGoal() {
-      goal = [];
-      for (let i = 0; i < geneLength; i++) {
-        goal.push(1);
-      }
       // goalは[1, 1, 1, ...... , 1]となります
+      goal = Array(360).fill(1)
+
       context.beginPath();
-      context.fillStyle = `hsl(${geneLength},50%,50%)`;
+      context.fillStyle = `hsl(${genomeSize},50%,50%)`;
       context.rect(0, 0, canvas.width, 10);
       context.fill();
     }
 
     // 個体の遺伝子配列をランダムに作成します
     function createGenome() {
-      const genome_list = [];
-      let c = Math.floor(Math.random() * geneLength);
+      const initialGenome = [];
+      let c = Math.floor(Math.random() * genomeSize);
       for (let i = 0; i < c; i++) {
-        genome_list.push(1);
+        initialGenome.push(1);
       }
-      for (let j = 0; j < geneLength - c; j++) {
-        genome_list.push(0);
+      for (let j = 0; j < genomeSize - c; j++) {
+        initialGenome.push(0);
       }
-      return new Biont(genome_list);
+      return new Biont(initialGenome);
     }
 
     function setup() {
-      for (let i = 0; i < size; i++) {
-        currentAge[i] = createGenome(geneLength);
+      for (let i = 0; i < generationSize; i++) {
+        currentAge[i] = createGenome(genomeSize);
       }
       generation = 0;
       createGoal();

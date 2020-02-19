@@ -11,6 +11,9 @@
     const canvas = document.querySelector("canvas");
     const context = canvas.getContext("2d");
 
+    const ALIVE = 1;
+    const DEATH = 0;
+
     let cell = [];
     // セルの大きさ
     const cellSize = 8;
@@ -42,7 +45,7 @@
     // セルの描画を指定
     function drawCell(x, y) {
       const state = cell[x][y];
-      context.fillStyle = state ? "rgb(0,0,100)" : "rgb(255,255,255)";
+      context.fillStyle = state === ALIVE ? "rgb(0,0,100)" : "rgb(255,255,255)";
       context.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
     }
 
@@ -72,13 +75,13 @@
           // 周りの生存セルの数を取得
           let count = checkAround(col, row);
           let currentState = cell[col][row];
-          let nextState = 0;
+          let nextState = DEATH;
           // 生存時に周りに2体いるときは維持
           if (count === 2) {
-            nextState = currentState ? 1 : 0;
+            nextState = currentState ? ALIVE : DEATH;
           }
           // 周りに3体いるときは誕生または維持
-          if (count === 3) nextState = 1;
+          if (count === 3) nextState = ALIVE;
           cell[col][row] = nextState;
         }
       }
@@ -87,7 +90,7 @@
 
     initCells();
     // 100ミリ秒ごとにproceed関数を実行
-    let timer1 = setInterval("proceed()", 100);
+    let timer1 = setInterval(proceed, 100);
 
   </script>
 </body>
