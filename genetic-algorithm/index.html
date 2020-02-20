@@ -201,7 +201,7 @@
         // elite, progeny, 現在の世代から適応度の高い順に選別
         newAge = getNextGeneration(currentAge, elite, progeny);
         // 適度に変異を入れる
-        newAge = mutation(newAge, INDIVISUAL_MUTATION, GENOME_MUTATION);
+        newAge = mutation(newAge, INDIVIDUAL_MUTATION, GENOME_MUTATION);
         // 描画
         newAge.forEach((age, index) => {
           context.beginPath();
