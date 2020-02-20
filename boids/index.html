@@ -118,15 +118,15 @@
       );
     }
 
-    function loop(timestamp) {
+    function loop() {
       context.clearRect(0, 0, canvas.width, canvas.height);
       boids.forEach(biont => {
         biont.draw();
       });
-      window.requestAnimationFrame(ts => loop(ts));
+      window.requestAnimationFrame(loop);
     }
-    window.requestAnimationFrame(ts => loop(ts));
 
+    loop()
 
   </script>
 </body>

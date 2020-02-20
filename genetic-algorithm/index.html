@@ -187,9 +187,8 @@
 
     /**
      * timestampミリ秒ごとに処理を実行します
-     * @param timestamp
      */
-    function loop(timestamp) {
+    function loop() {
       if (generation < 66) {
         // selection
         const elite = getElite(currentAge, 2);
@@ -220,12 +219,10 @@
         currentAge = newAge;
         newAge = [];
       }
-      window.requestAnimationFrame(ts => loop(ts));
+      window.requestAnimationFrame(loop);
     }
 
-    window.requestAnimationFrame(ts => loop(ts));
-
-
+    loop()
 
   </script>
 </body>
