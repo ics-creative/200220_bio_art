@@ -67,7 +67,9 @@
         context.lineTo(this.x + this.vx * 3, this.y + this.vy * 3);
         context.stroke();
       }
-      // 集団の中心に向かって移動します
+      /**
+       * 集団の中心に向かって移動します
+       */
       getToCenterVector() {
         // 他の個体の座標の平均をgetToCenterVectorに代入します
         const center = { x: 0, y: 0 };
@@ -81,7 +83,9 @@
         this.v1.x = (center.x - this.x) / 400;
         this.v1.y = (center.y - this.y) / 400;
       }
-      // DIST_THRESHOLD内に仲間がいると避けます
+      /**
+       * DIST_THRESHOLD内に仲間がいると避けます
+       */
       getAvoidanceVector() {
         const DIST_THRESHOLD = radius;
         Boids.filter(
@@ -91,7 +95,9 @@
           this.v2.y -= biont.y - this.y;
         });
       }
-      // 集団と同じ速度で動こうとします
+      /**
+       * 集団の速度の平均に近づけます
+       */
       getAverageVelocityVector() {
         // avgVに各個体の速度の平均を代入します
         const avgV = { x: 0, y: 0 };

@@ -31,7 +31,11 @@
         this.genome = genome;
       }
 
-      // 適応度を取得します
+      /**
+       * 適応度を取得します
+       * @param goal
+       * @returns {number}
+       */
       getEvaluation(goal) {
         let score = 0;
         for (let i = 0; i < this.genome.length; i++) {
@@ -43,13 +47,20 @@
         return score / this.genome.length;
       }
 
-      // genomeの要素を足し合わせ、合計の数値を返します
+      /**
+       * genomeの要素を足し合わせ、合計の数値を返します
+       * @returns {*}
+       */
       getColor() {
         return this.genome.reduce((total, current) => {
           return total + current;
         }, 0);
       }
 
+      /**
+       * 遺伝子配列を更新します
+       * @param genome
+       */
       setGenome(genome) {
         this.genome = genome;
       }
