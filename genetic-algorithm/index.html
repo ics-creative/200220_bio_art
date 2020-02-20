@@ -34,7 +34,6 @@
       /**
        * 適応度を取得します
        * @param goal
-       * @returns {number}
        */
       getEvaluation(goal) {
         let score = 0;
@@ -49,7 +48,6 @@
 
       /**
        * genomeの要素を足し合わせ、合計の数値を返します
-       * @returns {*}
        */
       getColor() {
         return this.genome.reduce((total, current) => {
@@ -70,7 +68,6 @@
      * 適応度の高い遺伝子を持つ個体をvalue体だけ選別します
      * @param age
      * @param value
-     * @returns {Int16Array}
      */
     function getElite(age, value) {
       const elite = age.sort((a, b) => {
@@ -83,7 +80,6 @@
      * 引数bios1, bios2の遺伝子配列を交叉させた子を返します
      * @param bios1
      * @param bios2
-     * @returns {Biont[]}
      */
     function getCrossedProgeny(bios1, bios2) {
       // bios1とbios2の遺伝子配列のcrossOne番目からcrossTwo番目を交換します
@@ -110,7 +106,6 @@
      * @param age
      * @param elite
      * @param progeny
-     * @returns {this | this | this | this | this | this | this | this | this | this | this | this | void}
      */
     function getNextGeneration(age, elite, progeny) {
       const sortedAge = age.sort((a, b) => {
@@ -126,7 +121,6 @@
      * @param age
      * @param individualMutationRate：個体が変異する確率です
      * @param genomeMutationRateRate：個々の遺伝子の変異確率です
-     * @returns {[]}
      */
     function mutation(age, individualMutationRate, genomeMutationRateRate) {
       let Boids = [];
@@ -166,7 +160,6 @@
 
     /**
      * 個体の遺伝子配列をランダムに作成します
-     * @returns {Biont}
      */
     function createGenome() {
       const initialGenome = [];

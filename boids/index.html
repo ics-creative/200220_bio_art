@@ -20,7 +20,6 @@
      * @param y0
      * @param x1
      * @param y1
-     * @returns {number}
      */
     function dist(x0, y0, x1, y1) {
       return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
@@ -40,8 +39,8 @@
       }
       update() {
         const MAX_SPEED = 4;
-        this.vx += this.v1.x + 0.8 * this.v2.x + 0.1 * this.v3.x;
-        this.vy += this.v1.y + 0.8 * this.v2.y + 0.1 * this.v3.y;
+        this.vx += 0.01 * this.v1.x + 0.8 * this.v2.x + 0.1 * this.v3.x;
+        this.vy += 0.01 * this.v1.y + 0.8 * this.v2.y + 0.1 * this.v3.y;
 
         const movement = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
         if (movement > MAX_SPEED) {
@@ -80,8 +79,8 @@
         center.x /= Boids.length - 1;
         center.y /= Boids.length - 1;
 
-        this.v1.x = (center.x - this.x) / 400;
-        this.v1.y = (center.y - this.y) / 400;
+        this.v1.x = center.x - this.x;
+        this.v1.y = center.y - this.y;
       }
       /**
        * DIST_THRESHOLD内に仲間がいると避けます
@@ -107,8 +106,8 @@
         });
         avgV.x /= Boids.length - 1;
         avgV.y /= Boids.length - 1;
-        this.v3.x = (avgV.x - this.vx) / 2;
-        this.v3.y = (avgV.y - this.vy) / 2;
+        this.v3.x = avgV.x - this.vx;
+        this.v3.y = avgV.y - this.vy;
       }
     }
 

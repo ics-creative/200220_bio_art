@@ -12,7 +12,7 @@
     const context = canvas.getContext("2d");
 
     const ALIVE = 1;
-    const DEATH = 0;
+    const DEAD = 0;
 
     let cell = [];
     // セルの大きさ
@@ -64,7 +64,6 @@
      * 周囲9マスのセルのうち、生存しているセルの数を返す関数です
      * @param x
      * @param y
-     * @returns {number}
      */
     function checkAround(x, y) {
       let count = 0;
@@ -93,10 +92,10 @@
           // 周りの生存セルの数を取得
           const count = checkAround(col, row);
           const currentState = cell[col][row];
-          let nextState = DEATH;
+          let nextState = DEAD;
           // 生存時に周りに2体いるときは維持
           if (count === 2) {
-            nextState = currentState === ALIVE ? ALIVE : DEATH;
+            nextState = currentState ;
           }
           // 周りに3体いるときは誕生または維持
           if (count === 3) nextState = ALIVE;
