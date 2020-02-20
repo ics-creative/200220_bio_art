@@ -121,7 +121,7 @@
      * @param individualMutationRate：個体が変異する確率です
      * @param genomeMutationRateRate：個々の遺伝子の変異確率です
      */
-    function mutation(age, individualMutationRate, genomeMutationRateRate) {
+    function mutate(age, individualMutationRate, genomeMutationRateRate) {
       const boids = [];
       age.forEach(biont => {
         // 確率的に変異させる個体を選別します
@@ -201,7 +201,7 @@
         // elite, progeny, 現在の世代から適応度の高い順に選別
         newAge = getNextGeneration(currentAge, elite, progeny);
         // 適度に変異を入れる
-        newAge = mutation(newAge, INDIVIDUAL_MUTATION, GENOME_MUTATION);
+        newAge = mutate(newAge, INDIVIDUAL_MUTATION, GENOME_MUTATION);
         // 描画
         newAge.forEach((age, index) => {
           context.beginPath();
