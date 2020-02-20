@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Boids</title>
+  <title>boids</title>
 </head>
 <body>
   <canvas id="canvas" width="1280" height="640" style="background-color: black"></canvas>
@@ -10,7 +10,7 @@
   <script>
     const canvas = document.querySelector("canvas");
     const context = canvas.getContext("2d");
-    const Boids = [];
+    const boids = [];
 
     const radius = 10;
 
@@ -72,12 +72,12 @@
       getToCenterVector() {
         // 他の個体の座標の平均をgetToCenterVectorに代入します
         const center = { x: 0, y: 0 };
-        Boids.filter(biont => this.id !== biont.id).forEach(biont => {
+        boids.filter(biont => this.id !== biont.id).forEach(biont => {
           center.x += biont.x;
           center.y += biont.y;
         });
-        center.x /= Boids.length - 1;
-        center.y /= Boids.length - 1;
+        center.x /= boids.length - 1;
+        center.y /= boids.length - 1;
 
         this.v1.x = center.x - this.x;
         this.v1.y = center.y - this.y;
@@ -87,7 +87,7 @@
        */
       getAvoidanceVector() {
         const DIST_THRESHOLD = radius;
-        Boids.filter(
+        boids.filter(
           biont => dist(this.x, this.y, biont.x, biont.y) < DIST_THRESHOLD
         ).forEach(biont => {
           this.v2.x -= biont.x - this.x;
@@ -100,26 +100,26 @@
       getAverageVelocityVector() {
         // avgVに各個体の速度の平均を代入します
         const avgV = { x: 0, y: 0 };
-        Boids.filter(biont => this.id !== biont.id).forEach(biont => {
+        boids.filter(biont => this.id !== biont.id).forEach(biont => {
           avgV.x += biont.vx;
           avgV.y += biont.vy;
         });
-        avgV.x /= Boids.length - 1;
-        avgV.y /= Boids.length - 1;
+        avgV.x /= boids.length - 1;
+        avgV.y /= boids.length - 1;
         this.v3.x = avgV.x - this.vx;
         this.v3.y = avgV.y - this.vy;
       }
     }
 
-    for (let i = 0; i < 30; i++) {
-      Boids.push(
-        new Biont(200 + Math.random() * 200, 200 + Math.random() * 100, 2, 2, i)
+    for (let i = 0; i < 50; i++) {
+      boids.push(
+        new Biont(200 + Math.random() * 500, 200 + Math.random() * 200, 2, 2, i)
       );
     }
 
     function loop(timestamp) {
       context.clearRect(0, 0, canvas.width, canvas.height);
-      Boids.forEach(biont => {
+      boids.forEach(biont => {
         biont.draw();
       });
       window.requestAnimationFrame(ts => loop(ts));
