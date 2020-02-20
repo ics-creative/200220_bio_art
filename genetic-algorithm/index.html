@@ -126,7 +126,7 @@
       age.forEach(biont => {
         // 確率的に変異させる個体を選別します
         if (individualMutationRate > Math.random()) {
-          let mutatedGenome = [];
+          const mutatedGenome = [];
           biont.genome.forEach(genome => {
             // 確率的に変異させる遺伝子を選別します
             if (genomeMutationRateRate > Math.random()) {
