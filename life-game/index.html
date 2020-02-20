@@ -14,7 +14,7 @@
     const ALIVE = 1;
     const DEAD = 0;
 
-    let cell = [];
+    const cell = [];
     // セルの大きさ
     const cellSize = 8;
 
@@ -98,7 +98,9 @@
             nextState = currentState ;
           }
           // 周りに3体いるときは誕生または維持
-          if (count === 3) nextState = ALIVE;
+          if (count === 3) {
+            nextState = ALIVE;
+          }
           cell[col][row] = nextState;
         }
       }
@@ -107,7 +109,7 @@
 
     initCells();
     // 100ミリ秒ごとにproceed関数を実行
-    let timer1 = setInterval(proceed, 100);
+    setInterval(proceed, 100);
 
 
   </script>

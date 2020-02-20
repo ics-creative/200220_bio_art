@@ -12,7 +12,7 @@
     const context = canvas.getContext("2d");
     const boids = [];
 
-    const radius = 10;
+    const radius = 20;
 
     /**
      * (x0, y0)と(x1, y1)の距離を返す関数です
@@ -39,8 +39,8 @@
       }
       update() {
         const MAX_SPEED = 4;
-        this.vx += 0.01 * this.v1.x + 0.8 * this.v2.x + 0.1 * this.v3.x;
-        this.vy += 0.01 * this.v1.y + 0.8 * this.v2.y + 0.1 * this.v3.y;
+        this.vx += 0.001 * this.v1.x + 0.8 * this.v2.x + 0.1 * this.v3.x;
+        this.vy += 0.001 * this.v1.y + 0.8 * this.v2.y + 0.1 * this.v3.y;
 
         const movement = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
         if (movement > MAX_SPEED) {
@@ -61,6 +61,7 @@
         this.update();
         context.beginPath();
         context.strokeStyle = "#ffffff";
+        context.lineWidth = 2
         context.arc(this.x, this.y, radius / 2, 0, 2 * Math.PI);
         context.moveTo(this.x, this.y);
         context.lineTo(this.x + this.vx * 3, this.y + this.vy * 3);
