@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>boids</title>
+  <meta name=”viewport” content=”width=960">
+  <style>
+    body{
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-  <canvas id="canvas" width="1280" height="640" style="background-color: black"></canvas>
+  <canvas id="canvas" width="960" height="540" style="background-color: black"></canvas>
 
   <script>
     const canvas = document.querySelector("canvas");
@@ -129,5 +136,6 @@
     loop()
 
   </script>
+
 </body>
 </html>
